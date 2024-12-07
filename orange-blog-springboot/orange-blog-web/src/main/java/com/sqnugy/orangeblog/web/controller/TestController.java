@@ -3,6 +3,7 @@ package com.sqnugy.orangeblog.web.controller;
 import com.sqnugy.orangeblog.common.aspect.ApiOperationLog;
 import com.sqnugy.orangeblog.common.enums.ResponseCodeEnum;
 import com.sqnugy.orangeblog.common.exception.BizException;
+import com.sqnugy.orangeblog.common.utils.JsonUtil;
 import com.sqnugy.orangeblog.common.utils.Response;
 import com.sqnugy.orangeblog.web.model.User;
 import io.swagger.annotations.Api;
@@ -16,6 +17,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.stream.Collectors;
 
 /**
@@ -35,8 +39,17 @@ public class TestController {
     @ApiOperationLog(description = "测试接口")
     @ApiOperation(value = "测试接口")
     public Response test(@RequestBody @Validated User user) {
-        return Response.success();
+        // 打印入参
+        log.info(JsonUtil.toJsonString(user));
+
+        // 设置三种日期字段值
+        user.setCreateTime(LocalDateTime.now());
+        user.setUpdateDate(LocalDate.now());
+        user.setTime(LocalTime.now());
+
+        return Response.success(user);
     }
+
 
 
 
