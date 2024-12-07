@@ -5,6 +5,8 @@ import com.sqnugy.orangeblog.common.enums.ResponseCodeEnum;
 import com.sqnugy.orangeblog.common.exception.BizException;
 import com.sqnugy.orangeblog.common.utils.Response;
 import com.sqnugy.orangeblog.web.model.User;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -26,15 +28,16 @@ import java.util.stream.Collectors;
 
 @RestController //RestController = ResponseBody + Controller | ResponseBody用于指示一个方法的返回值应该直接写入 HTTP 响应体中，而不是解析为视图名称。
 @Slf4j
+@Api(tags = "首页模块")
 public class TestController {
 
     @PostMapping("/test")
     @ApiOperationLog(description = "测试接口")
-    public Response test(@RequestBody @Validated User user, BindingResult bindingResult) {
-        // 主动定义一个运行时异常，分母不能为零
-        int i = 1 / 0;
+    @ApiOperation(value = "测试接口")
+    public Response test(@RequestBody @Validated User user) {
         return Response.success();
     }
+
 
 
 
