@@ -5,6 +5,7 @@
 *.class
 *Test.java
 **/test
+**/logs
 .DS_Store
 **/node_modules
 dist/
