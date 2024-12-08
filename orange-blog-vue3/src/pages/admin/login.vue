@@ -50,8 +50,8 @@ import { User, Lock } from '@element-plus/icons-vue'
 import { login } from '@/api/admin/user'
 import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router';
-import { showMessage} from '@/composables/utils'
-
+import { showMessage} from '@/composables/util'
+import { setToken } from '@/composables/auth'
 
 // 定义响应式的表单对象
 const form = reactive({
@@ -99,9 +99,13 @@ const onSubmit = () => {
             if (res.data.success == true) {
                 // 提示登录成功
                 showMessage('登录成功')
-
+                
                 // 跳转到后台首页
                 router.push('/admin/index')
+
+                // 存储 Token 到 Cookie 中
+                let token = res.data.data.token
+                setToken(token)
             } else {
                 let message = res.data.message
                 // 提示消息
