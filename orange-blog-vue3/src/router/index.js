@@ -1,5 +1,6 @@
 import Index from '@/pages/frontend/index.vue'
 import Login from '@/pages/admin/login.vue'
+import AdminIndex from '@/pages/admin/index.vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 // 统一在这里声明所有路由
@@ -8,16 +9,23 @@ const routes = [
         path: '/', // 路由地址
         component: Index, // 对应组件
         meta: { // meta 信息
-            title: 'OrangeBlog 首页' // 页面标题
+            title: '桔子博客-首页' // 页面标题
         }
     },
     {
         path: '/login', // 登录页
         component: Login,
         meta: {
-            title: 'OrangeBlog 登录页'
+            title: '桔子博客-登录页'
         }
     },
+    {
+        path: "/admin/index", // 后台首页
+        component: AdminIndex,
+        meta: {
+            title: '桔子博客后台首页'
+        }
+    }
 ]
 
 // 创建路由
