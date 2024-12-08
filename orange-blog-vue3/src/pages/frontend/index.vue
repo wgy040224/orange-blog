@@ -1,9 +1,9 @@
 <template>
     <nav class="bg-white border-gray-200 border-b dark:bg-gray-900">
-        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-3">
             <a href="/" class="flex items-center">
-                <img src="https://flowbite.com/docs/images/logo.svg" class="h-8 mr-3" alt="Flowbite Logo" />
-                <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">犬小哈的博客</span>
+                <img src="@/assets/orange-logo-48.png" class="h-12 mr-3" alt="桔子博客">
+                <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">sqnugy的博客</span>
             </a>
             <div class="flex items-center md:order-2">
                 <button type="button" data-collapse-toggle="navbar-search" aria-controls="navbar-search"
