@@ -25,7 +25,7 @@ public enum ResponseCodeEnum implements BaseExceptionInterface {
 
     // ----------- 业务异常状态码 -----------
     PRODUCT_NOT_FOUND("20000", "该产品不存在（测试使用）"),
-
+    FORBIDDEN("20004", "演示账号仅支持查询操作！"),
 
     // ----------- 登录失败响应码 -----------
     LOGIN_FAIL("20000", "登录失败"),
