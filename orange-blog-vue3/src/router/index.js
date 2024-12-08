@@ -9,21 +9,21 @@ const routes = [
         path: '/', // 路由地址
         component: Index, // 对应组件
         meta: { // meta 信息
-            title: '桔子博客-首页' // 页面标题
+            title: '桔子博客首页' // 页面标题
         }
     },
     {
         path: '/login', // 登录页
         component: Login,
         meta: {
-            title: '桔子博客-登录页'
+            title: '桔子博客登录页'
         }
     },
     {
         path: "/admin/index", // 后台首页
         component: AdminIndex,
         meta: {
-            title: '桔子博客后台首页'
+            title: '管理后台首页'
         }
     }
 ]
