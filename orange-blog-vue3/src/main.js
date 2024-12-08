@@ -1,6 +1,7 @@
 import './assets/main.css'
 // 导入 Element Plus 图标
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import 'nprogress/nprogress.css'
 import 'animate.css'
 
 import { createApp } from 'vue'
