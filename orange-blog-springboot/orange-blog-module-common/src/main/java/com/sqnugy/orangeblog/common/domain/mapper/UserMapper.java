@@ -1,8 +1,11 @@
 package com.sqnugy.orangeblog.common.domain.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.sqnugy.orangeblog.common.domain.dos.UserDO;
+
+import java.time.LocalDateTime;
 
 /**
  * @author sqnugy
@@ -27,4 +30,22 @@ public interface UserMapper extends BaseMapper<UserDO> {
         // 执行查询并返回结果
         return selectOne(wrapper);
     }
+
+    /**
+     * 通过用户名修改密码
+     * @param username
+     * @param password
+     * @return
+     */
+    default int updatePasswordByUsername(String username, String password) {
+        LambdaUpdateWrapper<UserDO> wrapper = new LambdaUpdateWrapper<>();
+        // 设置要更新的字段
+        wrapper.set(UserDO::getPassword, password);
+        wrapper.set(UserDO::getUpdateTime, LocalDateTime.now());
+        // 更新条件
+        wrapper.eq(UserDO::getUsername, username);
+
+        return update(null, wrapper);
+    }
+
 }
