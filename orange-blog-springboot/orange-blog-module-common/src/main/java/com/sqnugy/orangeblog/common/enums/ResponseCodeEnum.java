@@ -27,6 +27,7 @@ public enum ResponseCodeEnum implements BaseExceptionInterface {
     PRODUCT_NOT_FOUND("20000", "该产品不存在（测试使用）"),
     FORBIDDEN("20004", "演示账号仅支持查询操作！"),
     USERNAME_NOT_FOUND("20003", "该用户不存在"),
+    CATEGORY_NAME_IS_EXISTED("20005", "该分类已存在，请勿重复添加！"),
 
     // ----------- 登录失败响应码 -----------
     LOGIN_FAIL("20000", "登录失败"),
