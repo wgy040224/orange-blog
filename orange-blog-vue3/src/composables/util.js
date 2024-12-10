@@ -9,16 +9,6 @@ export function showMessage(message = '提示内容', type = 'success', customCl
     })
 }
 
-// 显示页面加载 Loading
-export function showPageLoading() {
-    nprogress.start()
-}
-
-// 隐藏页面加载 Loading
-export function hidePageLoading() {
-    nprogress.done()
-}
-
 // 弹出确认框
 export function showModel(content = '提示内容', type = 'warning', title = '') {
     return ElMessageBox.confirm(
@@ -32,3 +22,12 @@ export function showModel(content = '提示内容', type = 'warning', title = ''
     )
 }
 
+// 显示页面加载 Loading
+export function showPageLoading() {
+    nprogress.start()
+}
+
+// 隐藏页面加载 Loading
+export function hidePageLoading() {
+    nprogress.done()
+}
