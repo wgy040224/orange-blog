@@ -3,8 +3,8 @@ package com.sqnugy.orangeblog.admin.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.sqnugy.orangeblog.admin.model.vo.FindCategoryPageListReqVO;
-import com.sqnugy.orangeblog.admin.model.vo.FindCategoryPageListRspVO;
+import com.sqnugy.orangeblog.admin.model.vo.category.FindCategoryPageListReqVO;
+import com.sqnugy.orangeblog.admin.model.vo.category.FindCategoryPageListRspVO;
 import com.sqnugy.orangeblog.admin.model.vo.category.AddCategoryReqVO;
 import com.sqnugy.orangeblog.admin.model.vo.category.DeleteCategoryReqVO;
 import com.sqnugy.orangeblog.admin.service.AdminCategoryService;
@@ -54,7 +54,7 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
         CategoryDO categoryDO = categoryMapper.selectByName(categoryName);
 
         if (Objects.nonNull(categoryDO)) {
-            log.warn("分类名称： {}, 此分类已存在", categoryName);
+            log.warn("分类名称： {}, 此已存在", categoryName);
             throw new BizException(ResponseCodeEnum.CATEGORY_NAME_IS_EXISTED);
         }
 
@@ -69,32 +69,23 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
         return Response.success();
     }
 
-
-
+    /**
+     * 分类分页数据查询
+     *
+     * @param findCategoryPageListReqVO
+     * @return
+     */
     @Override
-    public PageResponse findCategoryList(FindCategoryPageListReqVO findCategoryPageListReqVO) {
+    public PageResponse findCategoryPageList(FindCategoryPageListReqVO findCategoryPageListReqVO) {
         // 获取当前页、以及每页需要展示的数据数量
         Long current = findCategoryPageListReqVO.getCurrent();
         Long size = findCategoryPageListReqVO.getSize();
-
-        // 分页对象(查询第几页、每页多少数据)
-        Page<CategoryDO> page = new Page<>(current, size);
-
-        // 构建查询条件
-        LambdaQueryWrapper<CategoryDO> wrapper = new LambdaQueryWrapper<>();
-
         String name = findCategoryPageListReqVO.getName();
         LocalDate startDate = findCategoryPageListReqVO.getStartDate();
         LocalDate endDate = findCategoryPageListReqVO.getEndDate();
 
-        wrapper
-                .like(StringUtils.isNotBlank(name), CategoryDO::getName, name.trim()) // like 模块查询
-                .ge(Objects.nonNull(startDate), CategoryDO::getCreateTime, startDate) // 大于等于 startDate
-                .le(Objects.nonNull(endDate), CategoryDO::getCreateTime, endDate)  // 小于等于 endDate
-                .orderByDesc(CategoryDO::getCreateTime); // 按创建时间倒叙
-
         // 执行分页查询
-        Page<CategoryDO> categoryDOPage = categoryMapper.selectPage(page, wrapper);
+        Page<CategoryDO> categoryDOPage = categoryMapper.selectPageList(current, size, name, startDate, endDate);
 
         List<CategoryDO> categoryDOS = categoryDOPage.getRecords();
 
@@ -113,6 +104,12 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
         return PageResponse.success(categoryDOPage, vos);
     }
 
+    /**
+     * 删除分类
+     *
+     * @param deleteCategoryReqVO
+     * @return
+     */
     @Override
     public Response deleteCategory(DeleteCategoryReqVO deleteCategoryReqVO) {
         // 分类 ID
@@ -124,6 +121,11 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
         return Response.success();
     }
 
+    /**
+     * 获取文章分类的 Select 列表数据
+     *
+     * @return
+     */
     @Override
     public Response findCategorySelectList() {
         // 查询所有分类

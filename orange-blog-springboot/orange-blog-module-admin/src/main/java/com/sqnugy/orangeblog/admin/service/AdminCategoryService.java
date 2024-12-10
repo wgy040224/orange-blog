@@ -1,6 +1,6 @@
 package com.sqnugy.orangeblog.admin.service;
 
-import com.sqnugy.orangeblog.admin.model.vo.FindCategoryPageListReqVO;
+import com.sqnugy.orangeblog.admin.model.vo.category.FindCategoryPageListReqVO;
 import com.sqnugy.orangeblog.admin.model.vo.category.AddCategoryReqVO;
 import com.sqnugy.orangeblog.admin.model.vo.category.DeleteCategoryReqVO;
 import com.sqnugy.orangeblog.common.utils.PageResponse;
@@ -27,7 +27,7 @@ public interface AdminCategoryService {
      * @param findCategoryPageListReqVO
      * @return
      */
-    PageResponse findCategoryList(FindCategoryPageListReqVO findCategoryPageListReqVO);
+    PageResponse findCategoryPageList(FindCategoryPageListReqVO findCategoryPageListReqVO);
 
     /**
      * 删除分类

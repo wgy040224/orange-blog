@@ -1,4 +1,4 @@
-package com.sqnugy.orangeblog.admin.model.vo;
+package com.sqnugy.orangeblog.admin.model.vo.category;
 
 import com.sqnugy.orangeblog.common.model.BasePageQuery;
 import io.swagger.annotations.ApiModel;

@@ -1,4 +1,4 @@
-package com.sqnugy.orangeblog.admin.model.vo;
+package com.sqnugy.orangeblog.admin.model.vo.tag;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  * @author sqnugy
  * @version 1.0
  * @ClassName FindCategoryPageListRspVO
- * @description
+ * @description 标签分页
  * @date 2024-12-09
  */
 
@@ -19,14 +19,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class FindCategoryPageListRspVO {
+public class FindTagPageListRspVO {
     /**
-     * 分类 ID
+     * 标签 ID
      */
     private Long id;
 
     /**
-     * 分类名称
+     * 标签名称
      */
     private String name;
 
