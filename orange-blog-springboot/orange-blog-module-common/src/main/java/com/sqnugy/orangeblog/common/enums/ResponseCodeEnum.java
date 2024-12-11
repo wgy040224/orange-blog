@@ -29,6 +29,9 @@ public enum ResponseCodeEnum implements BaseExceptionInterface {
     USERNAME_NOT_FOUND("20003", "该用户不存在"),
     CATEGORY_NAME_IS_EXISTED("20005", "该分类已存在，请勿重复添加！"),
     TAG_NOT_EXISTED("20006", "改标签不存在"),
+    FILE_UPLOAD_FAILED("20008", "文件上传失败！"),
+
+
 
     // ----------- 登录失败响应码 -----------
     LOGIN_FAIL("20000", "登录失败"),
