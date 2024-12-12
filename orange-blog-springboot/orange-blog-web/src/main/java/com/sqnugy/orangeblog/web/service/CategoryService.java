@@ -1,6 +1,7 @@
 package com.sqnugy.orangeblog.web.service;
 
 import com.sqnugy.orangeblog.common.utils.Response;
+import com.sqnugy.orangeblog.web.model.vo.category.FindCategoryArticlePageListReqVO;
 
 /**
  * @author sqnugy
@@ -16,5 +17,12 @@ public interface CategoryService {
      * @return
      */
     Response findCategoryList();
+
+    /**
+     * 获取分类下文章分页数据
+     * @param findCategoryArticlePageListReqVO
+     * @return
+     */
+    Response findCategoryArticlePageList(FindCategoryArticlePageListReqVO findCategoryArticlePageListReqVO);
 }
 
