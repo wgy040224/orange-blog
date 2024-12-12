@@ -3,6 +3,7 @@ package com.sqnugy.orangeblog.admin.controller;
 import com.sqnugy.orangeblog.admin.model.vo.article.DeleteArticleReqVO;
 import com.sqnugy.orangeblog.admin.model.vo.article.FindArticleDetailReqVO;
 import com.sqnugy.orangeblog.admin.model.vo.article.PublishArticleReqVO;
+import com.sqnugy.orangeblog.admin.model.vo.article.UpdateArticleReqVO;
 import com.sqnugy.orangeblog.admin.service.AdminArticleService;
 import com.sqnugy.orangeblog.common.aspect.ApiOperationLog;
 import com.sqnugy.orangeblog.common.utils.Response;
@@ -53,6 +54,15 @@ public class AdminArticleController {
     @ApiOperationLog(description = "查询文章详情")
     public Response findArticleDetail(@RequestBody @Validated FindArticleDetailReqVO findArticlePageListReqVO) {
         return articleService.findArticleDetail(findArticlePageListReqVO);
+    }
+
+
+    @PostMapping("/update")
+    @ApiOperation(value = "更新文章")
+    @ApiOperationLog(description = "更新文章")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public Response updateArticle(@RequestBody @Validated UpdateArticleReqVO updateArticleReqVO) {
+        return articleService.updateArticle(updateArticleReqVO);
     }
 
 
