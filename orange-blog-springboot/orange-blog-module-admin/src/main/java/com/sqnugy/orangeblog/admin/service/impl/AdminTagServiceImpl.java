@@ -5,9 +5,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sqnugy.orangeblog.admin.model.vo.tag.*;
 import com.sqnugy.orangeblog.admin.service.AdminTagService;
+import com.sqnugy.orangeblog.common.domain.dos.ArticleTagRelDO;
 import com.sqnugy.orangeblog.common.domain.dos.TagDO;
+import com.sqnugy.orangeblog.common.domain.mapper.ArticleTagRelMapper;
 import com.sqnugy.orangeblog.common.domain.mapper.TagMapper;
 import com.sqnugy.orangeblog.common.enums.ResponseCodeEnum;
+import com.sqnugy.orangeblog.common.exception.BizException;
 import com.sqnugy.orangeblog.common.model.vo.SelectRspVO;
 import com.sqnugy.orangeblog.common.utils.PageResponse;
 import com.sqnugy.orangeblog.common.utils.Response;
@@ -20,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +40,8 @@ public class AdminTagServiceImpl extends ServiceImpl<TagMapper, TagDO> implement
 
     @Autowired
     private TagMapper tagMapper;
+    @Autowired
+    private ArticleTagRelMapper articleTagRelMapper;
 
     /**
      * 添加标签集合
@@ -97,6 +103,7 @@ public class AdminTagServiceImpl extends ServiceImpl<TagMapper, TagDO> implement
 
     /**
      * 删除标签
+     *
      * @param deleteTagReqVO
      * @return
      */
@@ -105,7 +112,15 @@ public class AdminTagServiceImpl extends ServiceImpl<TagMapper, TagDO> implement
         // 标签 ID
         Long tagId = deleteTagReqVO.getId();
 
-        //根据标签 ID 删除
+        // 校验该标签下是否有关联的文章，若有，则不允许删除，提示用户需要先删除标签下的文章
+        ArticleTagRelDO articleTagRelDO = articleTagRelMapper.selectOneByTagId(tagId);
+
+        if (Objects.nonNull(articleTagRelDO)) {
+            log.warn("==> 此标签下包含文章，无法删除，tagId: {}", tagId);
+            throw new BizException(ResponseCodeEnum.TAG_CAN_NOT_DELETE);
+        }
+
+        // 根据标签 ID 删除
         int count = tagMapper.deleteById(tagId);
 
         return count == 1 ? Response.success() : Response.fail(ResponseCodeEnum.TAG_NOT_EXISTED);
@@ -135,4 +150,6 @@ public class AdminTagServiceImpl extends ServiceImpl<TagMapper, TagDO> implement
         }
         return Response.success(vos);
     }
+
+
 }
