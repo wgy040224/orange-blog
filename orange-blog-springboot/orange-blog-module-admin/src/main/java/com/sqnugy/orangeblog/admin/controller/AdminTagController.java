@@ -66,12 +66,12 @@ public class AdminTagController {
     }
 
 
-//    @PostMapping("/tag/select/list")
-//    @ApiOperation(value = "标签 Select 下拉列表数据获取")
-//    @ApiOperationLog(description = "标签 Select 下拉列表数据获取")
-//    public Response findTagSelectList() {
-//        return tagService.findTagSelectList();
-//    }
+    @PostMapping("/tag/select/list")
+    @ApiOperation(value = "查询标签 Select 列表数据")
+    @ApiOperationLog(description = "查询标签 Select 列表数据")
+    public Response findTagSelectList() {
+        return tagService.findTagSelectList();
+    }
 
 }
 
