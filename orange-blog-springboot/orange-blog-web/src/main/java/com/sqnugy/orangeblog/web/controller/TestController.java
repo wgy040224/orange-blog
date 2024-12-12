@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Api(tags = "首页模块")
 public class TestController {
 
-    @PostMapping("/admin/test")
+    @PostMapping("/test")
     @ApiOperationLog(description = "测试接口")
     @ApiOperation(value = "测试接口")
     public Response test(@RequestBody @Validated User user) {
@@ -45,6 +45,7 @@ public class TestController {
 
         return Response.success(user);
     }
+
 
     @PostMapping("/admin/update")
     @ApiOperationLog(description = "测试更新接口")
