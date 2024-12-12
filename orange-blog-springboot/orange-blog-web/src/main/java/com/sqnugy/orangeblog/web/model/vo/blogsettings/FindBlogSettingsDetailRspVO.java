@@ -1,0 +1,30 @@
+package com.sqnugy.orangeblog.web.model.vo.blogsettings;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * @author sqnugy
+ * @version 1.0
+ * @ClassName FindBlogSettingsDetailRspVO
+ * @description
+ * @date 2024-12-12
+ */
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class FindBlogSettingsDetailRspVO {
+    private String logo;
+    private String name;
+    private String author;
+    private String introduction;
+    private String avatar;
+    private String githubHomepage;
+    private String csdnHomepage;
+    private String giteeHomepage;
+    private String zhihuHomepage;
+}
