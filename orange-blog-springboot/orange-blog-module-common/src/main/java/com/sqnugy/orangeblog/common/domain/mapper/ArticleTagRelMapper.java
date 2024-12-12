@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.sqnugy.orangeblog.common.config.InsertBatchMapper;
 import com.sqnugy.orangeblog.common.domain.dos.ArticleTagRelDO;
 
+import java.util.List;
+
 /**
  * @author sqnugy
  * @version 1.0
@@ -21,6 +23,16 @@ public interface ArticleTagRelMapper extends InsertBatchMapper<ArticleTagRelDO> 
      */
     default int deleteByArticleId(Long articleId) {
         return delete(Wrappers.<ArticleTagRelDO>lambdaQuery()
+                .eq(ArticleTagRelDO::getArticleId, articleId));
+    }
+
+    /**
+     * 根据文章 ID 来查询
+     * @param articleId
+     * @return
+     */
+    default List<ArticleTagRelDO> selectByArticleId(Long articleId) {
+        return selectList(Wrappers.<ArticleTagRelDO>lambdaQuery()
                 .eq(ArticleTagRelDO::getArticleId, articleId));
     }
 }

@@ -1,6 +1,7 @@
 package com.sqnugy.orangeblog.admin.controller;
 
 import com.sqnugy.orangeblog.admin.model.vo.article.DeleteArticleReqVO;
+import com.sqnugy.orangeblog.admin.model.vo.article.FindArticleDetailReqVO;
 import com.sqnugy.orangeblog.admin.model.vo.article.PublishArticleReqVO;
 import com.sqnugy.orangeblog.admin.service.AdminArticleService;
 import com.sqnugy.orangeblog.common.aspect.ApiOperationLog;
@@ -46,6 +47,14 @@ public class AdminArticleController {
     public Response deleteArticle(@RequestBody @Validated DeleteArticleReqVO deleteArticleReqVO) {
         return articleService.deleteArticle(deleteArticleReqVO);
     }
+
+    @PostMapping("/detail")
+    @ApiOperation(value = "查询文章详情")
+    @ApiOperationLog(description = "查询文章详情")
+    public Response findArticleDetail(@RequestBody @Validated FindArticleDetailReqVO findArticlePageListReqVO) {
+        return articleService.findArticleDetail(findArticlePageListReqVO);
+    }
+
 
 
 }
