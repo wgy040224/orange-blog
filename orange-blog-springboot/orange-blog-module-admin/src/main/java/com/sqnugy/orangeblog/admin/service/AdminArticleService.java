@@ -1,5 +1,6 @@
 package com.sqnugy.orangeblog.admin.service;
 
+import com.sqnugy.orangeblog.admin.model.vo.article.DeleteArticleReqVO;
 import com.sqnugy.orangeblog.admin.model.vo.article.PublishArticleReqVO;
 import com.sqnugy.orangeblog.common.utils.Response;
 
@@ -18,5 +19,12 @@ public interface AdminArticleService {
      * @return
      */
     Response publishArticle(PublishArticleReqVO publishArticleReqVO);
+
+    /**
+     * 删除文章
+     * @param deleteArticleReqVO
+     * @return
+     */
+    Response deleteArticle(DeleteArticleReqVO deleteArticleReqVO);
 }
 
