@@ -17,6 +17,7 @@ import com.sqnugy.orangeblog.web.model.vo.article.*;
 import com.sqnugy.orangeblog.web.model.vo.category.FindCategoryListRspVO;
 import com.sqnugy.orangeblog.web.model.vo.tag.FindTagListRspVO;
 import com.sqnugy.orangeblog.web.service.ArticleService;
+import com.sqnugy.orangeblog.web.utils.MarkdownStatsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -165,13 +166,19 @@ public class ArticleServiceImpl implements ArticleService {
 
         // 查询正文
         ArticleContentDO articleContentDO = articleContentMapper.selectByArticleId(articleId);
+        String content = articleContentDO.getContent();
+
+        // 计算 md 正文字数
+        Integer totalWords = MarkdownStatsUtil.calculateWordCount(content);
 
         // DO 转 VO
         FindArticleDetailRspVO vo = FindArticleDetailRspVO.builder()
                 .title(articleDO.getTitle())
                 .createTime(articleDO.getCreateTime())
-                .content(MarkdownHelper.convertMarkdown2Html(articleContentDO.getContent()))
+                .content(MarkdownHelper.convertMarkdown2Html(content))
                 .readNum(articleDO.getReadNum())
+                .totalWords(totalWords)
+                .readTime(MarkdownStatsUtil.calculateReadingTime(totalWords))
                 .build();
 
         // 查询所属分类
