@@ -2,13 +2,18 @@ package com.sqnugy.orangeblog.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.sqnugy.orangeblog.admin.model.vo.dashboard.FindDashboardPVStatisticsInfoRspVO;
 import com.sqnugy.orangeblog.admin.model.vo.dashboard.FindDashboardStatisticsInfoRspVO;
 import com.sqnugy.orangeblog.admin.service.AdminDashboardService;
+import com.sqnugy.orangeblog.common.constant.Constants;
 import com.sqnugy.orangeblog.common.domain.dos.ArticleDO;
 import com.sqnugy.orangeblog.common.domain.dos.ArticlePublishCountDO;
+import com.sqnugy.orangeblog.common.domain.dos.StatisticsArticlePVDO;
 import com.sqnugy.orangeblog.common.domain.mapper.ArticleMapper;
 import com.sqnugy.orangeblog.common.domain.mapper.CategoryMapper;
+import com.sqnugy.orangeblog.common.domain.mapper.StatisticsArticlePVMapper;
 import com.sqnugy.orangeblog.common.domain.mapper.TagMapper;
 import com.sqnugy.orangeblog.common.utils.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +44,8 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
     private CategoryMapper categoryMapper;
     @Autowired
     private TagMapper tagMapper;
+    @Autowired
+    private StatisticsArticlePVMapper articlePVMapper;
 
     /**
      * 获取仪表盘基础统计信息
@@ -111,6 +118,50 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         }
 
         return Response.success(map);
+    }
+
+    /**
+     * 获取文章最近一周 PV 访问量统计信息
+     *
+     * @return
+     */
+    @Override
+    public Response findDashboardPVStatistics() {
+        // 查询最近一周的 PV 访问量记录
+        List<StatisticsArticlePVDO> articlePVDOS = articlePVMapper.selectLatestWeekRecords();
+
+        Map<LocalDate, Long> pvDateCountMap = Maps.newHashMap();
+        if (!CollectionUtils.isEmpty(articlePVDOS)) {
+            // 转 Map, 方便后续通过日期获取 PV 访问量
+            pvDateCountMap = articlePVDOS.stream()
+                    .collect(Collectors.toMap(StatisticsArticlePVDO::getPvDate, StatisticsArticlePVDO::getPvCount));
+        }
+
+        FindDashboardPVStatisticsInfoRspVO vo = null;
+
+        // 日期集合
+        List<String> pvDates = Lists.newArrayList();
+        // PV 集合
+        List<Long> pvCounts = Lists.newArrayList();
+
+        // 当前日期
+        LocalDate currDate = LocalDate.now();
+        // 一周前
+        LocalDate tmpDate = currDate.minusWeeks(1);
+        // 从一周前开始循环
+        for (; tmpDate.isBefore(currDate) || tmpDate.isEqual(currDate); tmpDate = tmpDate.plusDays(1)) {
+            // 设置对应日期的 PV 访问量
+            pvDates.add(tmpDate.format(Constants.MONTH_DAY_FORMATTER));
+            Long pvCount = pvDateCountMap.get(tmpDate);
+            pvCounts.add(Objects.isNull(pvCount) ? 0 : pvCount);
+        }
+
+        vo = FindDashboardPVStatisticsInfoRspVO.builder()
+                .pvDates(pvDates)
+                .pvCounts(pvCounts)
+                .build();
+
+        return Response.success(vo);
     }
 
 }
