@@ -22,7 +22,7 @@
                     </svg>
                     <div class="ml-5">
                         <h2 class="mb-1">文章</h2>
-                        <CountTo :value="articleTotalCount"></CountTo>
+                        <CountTo :value="articleTotalCount" customClass="font-bold text-2xl"></CountTo>
                     </div>
                 </div>
             </div>
