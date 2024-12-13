@@ -6,6 +6,7 @@ import TagList from '@/pages/frontend/tag-list.vue'
 import TagArticleList from '@/pages/frontend/tag-article-list.vue'
 import ArticleDetail from '@/pages/frontend/article-detail.vue'
 import Login from '@/pages/admin/login.vue'
+import NotFound from '@/pages/frontend/404.vue'
 import Admin from '@/layouts/admin/admin.vue'
 import AdminIndex from '@/pages/admin/index.vue'
 import AdminArticleList from '@/pages/admin/article-list.vue'
@@ -49,7 +50,7 @@ const routes = [
         path: '/tag/list', // 标签列表页
         component: TagList,
         meta: { // meta 信息
-            title: 'Weblog 标签列表页'
+            title: '桔子博客标签列表页'
         }
     },
     {
@@ -71,6 +72,14 @@ const routes = [
         component: Login,
         meta: {
             title: '桔子博客登录页'
+        }
+    },
+    {
+        path: '/:pathMatch(.*)*',
+        name: 'NotFound',
+        component: NotFound,
+        meta: {
+            title: '404 页'
         }
     },
     {

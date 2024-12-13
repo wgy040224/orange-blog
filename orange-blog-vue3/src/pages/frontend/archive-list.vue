@@ -2,7 +2,7 @@
     <Header></Header>
 
     <!-- 主内容区域 -->
-    <main class="container max-w-screen-xl mx-auto p-4 px-6">
+    <main class="container max-w-screen-xl mx-auto p-4">
         <!-- grid 表格布局，分为 4 列 -->
         <div class="grid grid-cols-4 gap-7">
             <!-- 左边栏，占用 3 列 -->
@@ -12,7 +12,7 @@
                     <time class="text-lg font-semibold text-gray-900 dark:text-white">{{ archive.month }}</time>
                     <ol class="mt-3 divide-y divider-gray-200 dark:divide-gray-700">
                         <li v-for="(article, index2) in archive.articles" :key="index2">
-                            <a href="#" class="items-center block p-3 sm:flex hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <a @click="goArticleDetailPage(article.id)" class="items-center block p-3 sm:flex hover:bg-gray-100 dark:hover:bg-gray-700">
                                 <img class="w-24 h-12 mb-3 mr-3 rounded-lg sm:mb-0"
                                     :src="article.cover"/>
                                 <div class="text-gray-600 dark:text-gray-400">
@@ -84,18 +84,23 @@
 
             <!-- 右边侧边栏，占用一列 -->
             <aside class="col-span-4 md:col-span-1">
-                <!-- 博主信息 -->
-                <UserInfoCard></UserInfoCard>
+                <div class="sticky top-[5.5rem]">
+                    <!-- 博主信息 -->
+                    <UserInfoCard></UserInfoCard>
 
-                <!-- 分类 -->
-                <CategoryListCard></CategoryListCard>
+                    <!-- 分类 -->
+                    <CategoryListCard></CategoryListCard>
 
-                <!-- 标签 -->
-                <TagListCard></TagListCard>
+                    <!-- 标签 -->
+                    <TagListCard></TagListCard>
+                </div>
             </aside>
         </div>
 
     </main>
+
+    <!-- 返回顶部 -->
+    <ScrollToTopButton></ScrollToTopButton>
 
     <Footer></Footer>
 </template>
@@ -106,8 +111,12 @@ import Footer from '@/layouts/frontend/components/Footer.vue'
 import UserInfoCard from '@/layouts/frontend/components/UserInfoCard.vue'
 import TagListCard from '@/layouts/frontend/components/TagListCard.vue'
 import CategoryListCard from '@/layouts/frontend/components/CategoryListCard.vue'
+import ScrollToTopButton from '@/layouts/frontend/components/ScrollToTopButton.vue'
 import { getArchivePageList } from '@/api/frontend/archive'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 // 文章归档
 const archives = ref([])
@@ -135,4 +144,9 @@ function getArchives(currentNo) {
     })
 }
 getArchives(current.value)
+
+// 跳转文章详情页
+const goArticleDetailPage = (articleId) => {
+    router.push('/article/' + articleId)
+}
 </script>
