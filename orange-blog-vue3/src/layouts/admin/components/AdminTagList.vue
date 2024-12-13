@@ -32,7 +32,6 @@ import { useTabList } from '@/composables/useTagList.js'
 const { menuStore, activeTab, tabList, tabChange, removeTab, handleCloseTab } = useTabList()
 </script>
 
-
 <style>
 .el-tabs__item {
     font-size: 12px;

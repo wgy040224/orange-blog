@@ -24,6 +24,16 @@
                     </div>
                 </el-tooltip>
 
+                <!-- 点击跳转前台首页 -->
+                <el-tooltip class="box-item" effect="dark" content="跳转前台" placement="bottom">
+                    <div class="w-[42px] h-[64px] cursor-pointer flex items-center justify-center text-gray-700 hover:bg-gray-200"
+                        @click="router.push('/')">
+                        <el-icon>
+                            <Monitor />
+                        </el-icon>
+                    </div>
+                </el-tooltip>
+
                 <!-- 点击全屏展示 -->
                 <el-tooltip class="box-item" effect="dark" content="全屏" placement="bottom">
                     <div class="w-[42px] h-[64px] cursor-pointer flex items-center justify-center text-gray-700 mr-2 hover:bg-gray-200"
@@ -57,32 +67,21 @@
         </div>
 
         <!-- 修改密码 -->
-        <el-dialog v-model="dialogVisible" title="修改密码" width="40%" :draggable ="true" :close-on-click-modal="false" :close-on-press-escape="false">
+        <FormDialog ref="formDialogRef" title="修改密码" destroyOnClose @submit="onSubmit">
             <el-form ref="formRef" :rules="rules" :model="form">
-                        <el-form-item label="用户名" prop="username" label-width="120px">
-                            <!-- 输入框组件 -->
-                            <el-input size="large" v-model="form.username" placeholder="请输入用户名" clearable disabled />
-                        </el-form-item>
-                        <el-form-item label="新密码" prop="password" label-width="120px">
-                            <el-input size="large" type="password" v-model="form.password" placeholder="请输入新密码"
-                                clearable show-password />
-                        </el-form-item>
-                        <el-form-item label="确认新密码" prop="rePassword" label-width="120px">
-                            <el-input size="large" type="password" v-model="form.rePassword" placeholder="请确认新密码"
-                                clearable show-password />
-                        </el-form-item>
-                    </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="dialogVisible = false">取消</el-button>
-                    <el-button type="primary" @click="onSubmit">
-                        提交
-                    </el-button>
-                </span>
-            </template>
-        </el-dialog>
+                <el-form-item label="用户名" prop="username" label-width="120px" size="large">
+                    <!-- 输入框组件 -->
+                    <el-input v-model="form.username" placeholder="请输入用户名" clearable disabled />
+                </el-form-item>
+                <el-form-item label="新密码" prop="password" label-width="120px" size="large">
+                    <el-input type="password" v-model="form.password" placeholder="请输入新密码" clearable show-password />
+                </el-form-item>
+                <el-form-item label="确认新密码" prop="rePassword" label-width="120px" size="large">
+                    <el-input type="password" v-model="form.rePassword" placeholder="请确认新密码" clearable show-password />
+                </el-form-item>
+            </el-form>
+        </FormDialog>
     </el-affix>
-    
 </template>
 
 <script setup>
@@ -93,6 +92,7 @@ import { useFullscreen } from '@vueuse/core'
 import { updateAdminPassword } from '@/api/admin/user'
 import { showMessage, showModel } from '@/composables/util'
 import { useRouter } from 'vue-router'
+import FormDialog from '@/components/FormDialog.vue'
 
 const router = useRouter()
 
@@ -113,14 +113,14 @@ const handleMenuWidth = () => {
 const handleRefresh = () => location.reload()
 
 // 对话框是否显示
-const dialogVisible = ref(false)
+const formDialogRef = ref(false)
 
 // 下拉菜单事件处理
 const handleCommand = (command) => {
     // 更新密码
     if (command == 'updatePassword') {
         // 显示修改密码对话框
-        dialogVisible.value = true
+        formDialogRef.value.open()
     } else if (command == 'logout') { // 退出登录
         logout()
     }
@@ -148,13 +148,13 @@ const form = reactive({
 
 // 监听Pinia store中的某个值的变化
 watch(() => userStore.userInfo.username, (newValue, oldValue) => {
-      // 在这里处理变化后的值
-      console.log('新值:', newValue);
-      console.log('旧值:', oldValue);
-      
-      // 可以在这里执行任何你需要的逻辑
-      // 重新将新的值，设置会 form 对象中
-      form.username = newValue
+    // 在这里处理变化后的值
+    console.log('新值:', newValue);
+    console.log('旧值:', oldValue);
+
+    // 可以在这里执行任何你需要的逻辑
+    // 重新将新的值，设置会 form 对象中
+    form.username = newValue
 });
 
 // 规则校验
@@ -195,6 +195,7 @@ const onSubmit = () => {
             return
         }
 
+        formDialogRef.value.showBtnLoading()
         // 调用修改用户密码接口
         updateAdminPassword(form).then((res) => {
             console.log(res)
@@ -205,7 +206,7 @@ const onSubmit = () => {
                 userStore.logout()
 
                 // 隐藏对话框
-                dialogVisible.value = false
+                formDialogRef.value.close()
 
                 // 跳转登录页
                 router.push('/login')
@@ -215,7 +216,7 @@ const onSubmit = () => {
                 // 提示消息
                 showMessage(message, 'error')
             }
-        })
+        }).finally(() => formDialogRef.value.closeBtnLoading())
     })
 }
 
