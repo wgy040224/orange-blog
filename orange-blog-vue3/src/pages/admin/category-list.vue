@@ -32,6 +32,7 @@
             <!-- 分页列表 -->
             <el-table :data="tableData" border stripe style="width: 100%" v-loading="tableLoading">
                 <el-table-column prop="name" label="分类名称" width="180" />
+                <el-table-column prop="articlesTotal" label="文章数" width="100" />
                 <el-table-column prop="createTime" label="创建时间" width="180" />
                 <el-table-column label="操作" >
                     <template #default="scope">
@@ -204,7 +205,8 @@ const onSubmit = () => {
             console.log('表单验证不通过')
             return false
         }
-        // 
+        
+        // 显示提交按钮 loading
         formDialogRef.value.showBtnLoading()
         addCategory(form).then((res) => {
             if (res.success == true) {
@@ -221,7 +223,7 @@ const onSubmit = () => {
                 // 提示错误消息
                 showMessage(message, 'error')
             }
-        }).finally(() => formDialogRef.value.closeBtnLoading())
+        }).finally(() => formDialogRef.value.closeBtnLoading()) // 隐藏提交按钮 loading
 
     })
 }
