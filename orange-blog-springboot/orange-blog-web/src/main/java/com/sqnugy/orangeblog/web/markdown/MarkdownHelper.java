@@ -1,7 +1,7 @@
 package com.sqnugy.orangeblog.web.markdown;
 
-import com.sqnugy.orangeblog.web.markdown.provider.NofollowLinkAttributeProvider;
 import com.sqnugy.orangeblog.web.markdown.renderer.ImageNodeRenderer;
+import com.sqnugy.orangeblog.web.markdown.renderer.LinkNodeRenderer;
 import org.commonmark.Extension;
 import org.commonmark.ext.gfm.tables.TablesExtension;
 import org.commonmark.ext.heading.anchor.HeadingAnchorExtension;
@@ -48,8 +48,8 @@ public class MarkdownHelper {
         PARSER = Parser.builder().extensions(extensions).build();
         HTML_RENDERER = HtmlRenderer.builder()
                 .extensions(extensions)
-                .attributeProviderFactory(context -> new NofollowLinkAttributeProvider())
-                .nodeRendererFactory(context -> new ImageNodeRenderer(context))
+                .nodeRendererFactory(context -> new ImageNodeRenderer(context)) // 自定义图片解析
+                .nodeRendererFactory(context -> new LinkNodeRenderer(context)) // 自定义超链接解析
                 .build();
     }
 
