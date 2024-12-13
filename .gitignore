@@ -10,6 +10,7 @@
 **/node_modules
 dist/
 .vscode/
+lucene-index/
 npm-debug.log
 application.yml
 application-dev.yml
