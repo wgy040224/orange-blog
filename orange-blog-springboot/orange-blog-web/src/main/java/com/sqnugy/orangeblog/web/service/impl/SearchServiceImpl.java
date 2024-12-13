@@ -5,7 +5,6 @@ import com.google.common.collect.Lists;
 import com.sqnugy.orangeblog.common.utils.PageResponse;
 import com.sqnugy.orangeblog.common.utils.Response;
 import com.sqnugy.orangeblog.search.LuceneHelper;
-import com.sqnugy.orangeblog.search.config.LuceneProperties;
 import com.sqnugy.orangeblog.search.index.ArticleIndex;
 import com.sqnugy.orangeblog.web.model.vo.search.SearchArticlePageListReqVO;
 import com.sqnugy.orangeblog.web.model.vo.search.SearchArticlePageListRspVO;
@@ -25,7 +24,6 @@ import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.StringReader;
 import java.util.List;
 
@@ -42,8 +40,6 @@ import java.util.List;
 public class SearchServiceImpl implements SearchService {
 
     @Autowired
-    private LuceneProperties luceneProperties;
-    @Autowired
     private LuceneHelper luceneHelper;
 
     @Override
@@ -51,18 +47,16 @@ public class SearchServiceImpl implements SearchService {
         int current = Math.toIntExact(searchArticlePageListReqVO.getCurrent());
         int size = Math.toIntExact(searchArticlePageListReqVO.getSize());
 
-        // 文章索引存放目录
-        String articleIndexDir = luceneProperties.getIndexDir() + File.separator + ArticleIndex.NAME;
         // 查询关键词
         String word = searchArticlePageListReqVO.getWord();
 
         // 想要搜索的文档字段（这里指定对文章标题、摘要进行检索，任何一个字段包含该关键词，都会被搜索到）
         String[] columns = {ArticleIndex.COLUMN_TITLE, ArticleIndex.COLUMN_SUMMARY};
         // 查询总记录数
-        long total = luceneHelper.searchTotal(articleIndexDir, word, columns);
+        long total = luceneHelper.searchTotal(ArticleIndex.NAME, word, columns);
 
         // 执行搜索（分页查询）
-        List<Document> documents = luceneHelper.search(articleIndexDir, word, columns, current, size);
+        List<Document> documents = luceneHelper.search(ArticleIndex.NAME, word, columns, current, size);
 
         // 若未查询到相关文档，只接 return
         if (CollectionUtils.isEmpty(documents)) {

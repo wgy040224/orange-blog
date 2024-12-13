@@ -62,9 +62,6 @@ public class InitLuceneIndexRunner implements CommandLineRunner {
             return;
         }
 
-        // 文章索引存放目录， 如 /app/weblog/lucene-index/article
-        String articleIndexDir = luceneProperties.getIndexDir() + File.separator + ArticleIndex.NAME;
-
         List<Document> documents = Lists.newArrayList();
         articleDOS.forEach(articleDO -> {
             Long articleId = articleDO.getId();
@@ -84,7 +81,7 @@ public class InitLuceneIndexRunner implements CommandLineRunner {
         });
 
         // 创建索引
-        luceneHelper.createIndex(articleIndexDir, documents);
+        luceneHelper.createIndex(ArticleIndex.NAME, documents);
 
         log.info("==> 结束初始化 Lucene 索引...");
     }

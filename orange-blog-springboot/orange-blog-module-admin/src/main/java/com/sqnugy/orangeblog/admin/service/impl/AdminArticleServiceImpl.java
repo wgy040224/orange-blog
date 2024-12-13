@@ -1,9 +1,13 @@
 package com.sqnugy.orangeblog.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.sqnugy.orangeblog.admin.convert.ArticleDetailConvert;
+import com.sqnugy.orangeblog.admin.event.DeleteArticleEvent;
+import com.sqnugy.orangeblog.admin.event.PublishArticleEvent;
+import com.sqnugy.orangeblog.admin.event.UpdateArticleEvent;
 import com.sqnugy.orangeblog.admin.model.vo.article.*;
 import com.sqnugy.orangeblog.admin.model.vo.category.DeleteCategoryReqVO;
 import com.sqnugy.orangeblog.admin.service.AdminArticleService;
@@ -15,6 +19,7 @@ import com.sqnugy.orangeblog.common.utils.PageResponse;
 import com.sqnugy.orangeblog.common.utils.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +55,8 @@ public class AdminArticleServiceImpl implements AdminArticleService {
     private TagMapper tagMapper;
     @Autowired
     private ArticleTagRelMapper articleTagRelMapper;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     /**
      * 发布文章
@@ -100,6 +107,175 @@ public class AdminArticleServiceImpl implements AdminArticleService {
         List<String> publishTags = publishArticleReqVO.getTags();
         insertTags(articleId, publishTags);
 
+        // 发送文章发布事件
+        eventPublisher.publishEvent(new PublishArticleEvent(this, articleId));
+
+        return Response.success();
+    }
+
+    /**
+     * 删除文章
+     *
+     * @param deleteArticleReqVO
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Response deleteArticle(DeleteArticleReqVO deleteArticleReqVO) {
+        Long articleId = deleteArticleReqVO.getId();
+
+        // 1. 删除文章
+        articleMapper.deleteById(articleId);
+
+        // 2. 删除文章内容
+        articleContentMapper.deleteByArticleId(articleId);
+
+        // 3. 删除文章-分类关联记录
+        articleCategoryRelMapper.deleteByArticleId(articleId);
+
+        // 4. 删除文章-标签关联记录
+        articleTagRelMapper.deleteByArticleId(articleId);
+
+        // 发布文章删除事件
+        eventPublisher.publishEvent(new DeleteArticleEvent(this, articleId));
+
+        return Response.success();
+    }
+
+    /**
+     * 查询文章分页数据
+     *
+     * @param findArticlePageListReqVO
+     * @return
+     */
+    @Override
+    public Response findArticlePageList(FindArticlePageListReqVO findArticlePageListReqVO) {
+        // 获取当前页、以及每页需要展示的数据数量
+        Long current = findArticlePageListReqVO.getCurrent();
+        Long size = findArticlePageListReqVO.getSize();
+        String title = findArticlePageListReqVO.getTitle();
+        LocalDate startDate = findArticlePageListReqVO.getStartDate();
+        LocalDate endDate = findArticlePageListReqVO.getEndDate();
+
+        // 执行分页查询
+        Page<ArticleDO> articleDOPage = articleMapper.selectPageList(current, size, title, startDate, endDate);
+
+        List<ArticleDO> articleDOS = articleDOPage.getRecords();
+
+        // DO 转 VO
+        List<FindArticlePageListRspVO> vos = null;
+        if (!CollectionUtils.isEmpty(articleDOS)) {
+            vos = articleDOS.stream()
+                    .map(articleDO -> FindArticlePageListRspVO.builder()
+                            .id(articleDO.getId())
+                            .title(articleDO.getTitle())
+                            .cover(articleDO.getCover())
+                            .createTime(articleDO.getCreateTime())
+                            .build())
+                    .collect(Collectors.toList());
+        }
+
+        return PageResponse.success(articleDOPage, vos);
+    }
+
+    /**
+     * 查询文章详情
+     *
+     * @param findArticleDetailReqVO
+     * @return
+     */
+    @Override
+    public Response<FindArticleDetailRspVO> findArticleDetail(FindArticleDetailReqVO findArticleDetailReqVO) {
+        Long articleId = findArticleDetailReqVO.getId();
+
+        ArticleDO articleDO = articleMapper.selectById(articleId);
+
+        if (Objects.isNull(articleDO)) {
+            log.warn("==> 查询的文章不存在，articleId: {}", articleId);
+            throw new BizException(ResponseCodeEnum.ARTICLE_NOT_FOUND);
+        }
+
+        ArticleContentDO articleContentDO = articleContentMapper.selectByArticleId(articleId);
+
+        // 所属分类
+        ArticleCategoryRelDO articleCategoryRelDO = articleCategoryRelMapper.selectByArticleId(articleId);
+
+        // 对应标签
+        List<ArticleTagRelDO> articleTagRelDOS = articleTagRelMapper.selectByArticleId(articleId);
+        // 获取对应标签 ID 集合
+        List<Long> tagIds = articleTagRelDOS.stream().map(ArticleTagRelDO::getTagId).collect(Collectors.toList());
+
+        // DO 转 VO
+        FindArticleDetailRspVO vo = ArticleDetailConvert.INSTANCE.convertDO2VO(articleDO);
+        vo.setContent(articleContentDO.getContent());
+        vo.setCategoryId(articleCategoryRelDO.getCategoryId());
+        vo.setTagIds(tagIds);
+
+        return Response.success(vo);
+    }
+
+    /**
+     * 更新文章
+     *
+     * @param updateArticleReqVO
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Response updateArticle(UpdateArticleReqVO updateArticleReqVO) {
+        Long articleId = updateArticleReqVO.getId();
+
+        // 1. VO 转 ArticleDO, 并更新
+        ArticleDO articleDO = ArticleDO.builder()
+                .id(articleId)
+                .title(updateArticleReqVO.getTitle())
+                .cover(updateArticleReqVO.getCover())
+                .summary(updateArticleReqVO.getSummary())
+                .updateTime(LocalDateTime.now())
+                .build();
+        int count = articleMapper.updateById(articleDO);
+
+        // 根据更新是否成功，来判断该文章是否存在
+        if (count == 0) {
+            log.warn("==> 该文章不存在, articleId: {}", articleId);
+            throw new BizException(ResponseCodeEnum.ARTICLE_NOT_FOUND);
+        }
+
+        // 2. VO 转 ArticleContentDO，并更新
+        ArticleContentDO articleContentDO = ArticleContentDO.builder()
+                .articleId(articleId)
+                .content(updateArticleReqVO.getContent())
+                .build();
+        articleContentMapper.updateByArticleId(articleContentDO);
+
+
+        // 3. 更新文章分类
+        Long categoryId = updateArticleReqVO.getCategoryId();
+
+        // 3.1 校验提交的分类是否真实存在
+        CategoryDO categoryDO = categoryMapper.selectById(categoryId);
+        if (Objects.isNull(categoryDO)) {
+            log.warn("==> 分类不存在, categoryId: {}", categoryId);
+            throw new BizException(ResponseCodeEnum.CATEGORY_NOT_EXISTED);
+        }
+
+        // 先删除该文章关联的分类记录，再插入新的关联关系
+        articleCategoryRelMapper.deleteByArticleId(articleId);
+        ArticleCategoryRelDO articleCategoryRelDO = ArticleCategoryRelDO.builder()
+                .articleId(articleId)
+                .categoryId(categoryId)
+                .build();
+        articleCategoryRelMapper.insert(articleCategoryRelDO);
+
+        // 4. 保存文章关联的标签集合
+        // 先删除该文章对应的标签
+        articleTagRelMapper.deleteByArticleId(articleId);
+        List<String> publishTags = updateArticleReqVO.getTags();
+        insertTags(articleId, publishTags);
+
+        // 发布文章修改事件
+        eventPublisher.publishEvent(new UpdateArticleEvent(this, articleId));
+
         return Response.success();
     }
 
@@ -115,7 +291,7 @@ public class AdminArticleServiceImpl implements AdminArticleService {
         List<String> existedTags = null;
 
         // 查询出所有标签
-        List<TagDO> tagDOS = tagMapper.selectList(null);
+        List<TagDO> tagDOS = tagMapper.selectList(Wrappers.emptyWrapper());
 
         // 如果表中还没有添加任何标签
         if (CollectionUtils.isEmpty(tagDOS)) {
@@ -128,7 +304,6 @@ public class AdminArticleServiceImpl implements AdminArticleService {
             // 否则则是不存在的
             notExistTags = publishTags.stream().filter(publishTag -> !tagIds.contains(publishTag)).collect(Collectors.toList());
 
-            // 补充逻辑：
             // 还有一种可能：按字符串名称提交上来的标签，也有可能是表中已存在的，比如表中已经有了 Java 标签，用户提交了个 java 小写的标签，需要内部装换为 Java 标签
             Map<String, Long> tagNameIdMap = tagDOS.stream().collect(Collectors.toMap(tagDO -> tagDO.getName().toLowerCase(), TagDO::getId));
 
@@ -187,164 +362,4 @@ public class AdminArticleServiceImpl implements AdminArticleService {
             articleTagRelMapper.insertBatchSomeColumn(articleTagRelDOS);
         }
     }
-
-    /**
-     * 删除文章
-     *
-     * @param deleteArticleReqVO
-     * @return
-     */
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Response deleteArticle(DeleteArticleReqVO deleteArticleReqVO) {
-        Long articleId = deleteArticleReqVO.getId();
-
-        // 1. 删除文章
-        articleMapper.deleteById(articleId);
-
-        // 2. 删除文章内容
-        articleContentMapper.deleteByArticleId(articleId);
-
-        // 3. 删除文章-分类关联记录
-        articleCategoryRelMapper.deleteByArticleId(articleId);
-
-        // 4. 删除文章-标签关联记录
-        articleTagRelMapper.deleteByArticleId(articleId);
-
-        return Response.success();
-    }
-
-    /**
-     * 查询文章分页数据
-     *
-     * @param findArticlePageListReqVO
-     * @return
-     */
-    @Override
-    public Response findArticlePageList(FindArticlePageListReqVO findArticlePageListReqVO) {
-        // 获取当前页、以及每页需要展示的数据数量
-        Long current = findArticlePageListReqVO.getCurrent();
-        Long size = findArticlePageListReqVO.getSize();
-        String title = findArticlePageListReqVO.getTitle();
-        LocalDate startDate = findArticlePageListReqVO.getStartDate();
-        LocalDate endDate = findArticlePageListReqVO.getEndDate();
-
-        // 执行分页查询
-        Page<ArticleDO> articleDOPage = articleMapper.selectPageList(current, size, title, startDate, endDate);
-
-        List<ArticleDO> articleDOS = articleDOPage.getRecords();
-
-        // DO 转 VO
-        List<FindArticlePageListRspVO> vos = null;
-        if (!CollectionUtils.isEmpty(articleDOS)) {
-            vos = articleDOS.stream()
-                    .map(articleDO -> FindArticlePageListRspVO.builder()
-                            .id(articleDO.getId())
-                            .title(articleDO.getTitle())
-                            .cover(articleDO.getCover())
-                            .createTime(articleDO.getCreateTime())
-                            .build())
-                    .collect(Collectors.toList());
-        }
-
-        return PageResponse.success(articleDOPage, vos);
-    }
-
-
-
-    /**
-     * 查询文章详情
-     *
-     * @param findArticleDetailReqVO
-     * @return
-     */
-    @Override
-    public Response findArticleDetail(FindArticleDetailReqVO findArticleDetailReqVO) {
-        Long articleId = findArticleDetailReqVO.getId();
-
-        ArticleDO articleDO = articleMapper.selectById(articleId);
-
-        if (Objects.isNull(articleDO)) {
-            log.warn("==> 查询的文章不存在，articleId: {}", articleId);
-            throw new BizException(ResponseCodeEnum.ARTICLE_NOT_FOUND);
-        }
-
-        ArticleContentDO articleContentDO = articleContentMapper.selectByArticleId(articleId);
-
-        // 所属分类
-        ArticleCategoryRelDO articleCategoryRelDO = articleCategoryRelMapper.selectByArticleId(articleId);
-
-        // 对应标签
-        List<ArticleTagRelDO> articleTagRelDOS = articleTagRelMapper.selectByArticleId(articleId);
-        // 获取对应标签 ID 集合
-        List<Long> tagIds = articleTagRelDOS.stream().map(ArticleTagRelDO::getTagId).collect(Collectors.toList());
-
-        // DO 转 VO
-        FindArticleDetailRspVO vo = ArticleDetailConvert.INSTANCE.convertDO2VO(articleDO);
-        vo.setContent(articleContentDO.getContent());
-        vo.setCategoryId(articleCategoryRelDO.getCategoryId());
-        vo.setTagIds(tagIds);
-
-        return Response.success(vo);
-    }
-
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Response updateArticle(UpdateArticleReqVO updateArticleReqVO) {
-        Long articleId = updateArticleReqVO.getId();
-
-        // 1. VO 转 ArticleDO, 并更新
-        ArticleDO articleDO = ArticleDO.builder()
-                .id(articleId)
-                .title(updateArticleReqVO.getTitle())
-                .cover(updateArticleReqVO.getCover())
-                .summary(updateArticleReqVO.getSummary())
-                .updateTime(LocalDateTime.now())
-                .build();
-        int count = articleMapper.updateById(articleDO);
-
-        // 根据更新是否成功，来判断该文章是否存在
-        if (count == 0) {
-            log.warn("==> 该文章不存在, articleId: {}", articleId);
-            throw new BizException(ResponseCodeEnum.ARTICLE_NOT_FOUND);
-        }
-
-        // 2. VO 转 ArticleContentDO，并更新
-        ArticleContentDO articleContentDO = ArticleContentDO.builder()
-                .articleId(articleId)
-                .content(updateArticleReqVO.getContent())
-                .build();
-        articleContentMapper.updateByArticleId(articleContentDO);
-
-
-        // 3. 更新文章分类
-        Long categoryId = updateArticleReqVO.getCategoryId();
-
-        // 3.1 校验提交的分类是否真实存在
-        CategoryDO categoryDO = categoryMapper.selectById(categoryId);
-        if (Objects.isNull(categoryDO)) {
-            log.warn("==> 分类不存在, categoryId: {}", categoryId);
-            throw new BizException(ResponseCodeEnum.CATEGORY_NOT_EXISTED);
-        }
-
-        // 先删除该文章关联的分类记录，再插入新的关联关系
-        articleCategoryRelMapper.deleteByArticleId(articleId);
-        ArticleCategoryRelDO articleCategoryRelDO = ArticleCategoryRelDO.builder()
-                .articleId(articleId)
-                .categoryId(categoryId)
-                .build();
-        articleCategoryRelMapper.insert(articleCategoryRelDO);
-
-        // 4. 保存文章关联的标签集合
-        // 先删除该文章对应的标签
-        articleTagRelMapper.deleteByArticleId(articleId);
-        List<String> publishTags = updateArticleReqVO.getTags();
-        insertTags(articleId, publishTags);
-
-        return Response.success();
-    }
-
-
-
 }
