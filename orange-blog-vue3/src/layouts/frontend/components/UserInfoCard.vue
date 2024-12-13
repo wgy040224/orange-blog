@@ -3,7 +3,7 @@
         <div class="flex flex-col items-center">
             <!-- 博主头像 -->
             <div class="relative mb-4">
-                <img class="w-20 h-20 rounded-full shadow"
+                <img class="w-14 h-14 rounded-full shadow"
                 :src="blogSettingsStore.blogSettings.avatar"/>    
                 <span
                     class="bottom-0 left-10 absolute w-3.5 h-3.5 bg-green-400 border-2 border-white dark:border-gray-800 rounded-full"></span>
@@ -23,22 +23,22 @@
 
              <!-- 文章数量、分类数量、标签数量、总访问量 -->
              <!-- flex 布局，justify-center 水平居中，gap-5 设置 flex 内子元素的间距 -->
-             <div class="flex justify-center gap-5 mb-2">
+             <div class="flex justify-center gap-5 mb-2 dark:text-gray-400">
                 <!-- flex 布局，items-center 垂直居中，flex-col 设置子元素上下排列，hover: 用于设置鼠标移动到上面的样式，字体颜色、放大效果，cursor-pointer 指定鼠标移动到上面为小手指样式 -->
                 <div 
-                    class="flex items-center flex-col gap-1 hover:text-blue-700 hover:scale-110 cursor-pointer">
+                    class="flex items-center flex-col gap-1 hover:text-sky-600 hover:scale-110 cursor-pointer">
                     <!-- 字体大小为 text-lg , 字体加粗 -->
                     <CountTo :value="statisticsInfo.articleTotalCount" customClass="text-lg font-bold"></CountTo>
                     <!-- 字体大小为 text-sm -->
                     <div class="text-sm">文章</div>
                 </div>
                 <div 
-                    class="flex items-center flex-col gap-1 hover:text-blue-700 hover:scale-110 cursor-pointer">
+                    class="flex items-center flex-col gap-1 hover:text-sky-600 hover:scale-110 cursor-pointer">
                     <CountTo :value="statisticsInfo.categoryTotalCount" customClass="text-lg font-bold"></CountTo>
                     <div class="text-sm">分类</div>
                 </div>
                 <div
-                    class="flex items-center flex-col gap-1 hover:text-blue-700 hover:scale-110 cursor-pointer">
+                    class="flex items-center flex-col gap-1 hover:text-sky-600 hover:scale-110 cursor-pointer">
                     <CountTo :value="statisticsInfo.tagTotalCount" customClass="text-lg font-bold"></CountTo>
                     <div class="text-sm">标签</div>
                 </div>
