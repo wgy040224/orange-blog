@@ -3,7 +3,7 @@
         <div class="flex flex-col items-center">
             <!-- 博主头像 -->
             <div class="relative mb-4">
-                <img class="w-14 h-14 rounded-full shadow"
+                <img class="w-20 h-20 rounded-full shadow"
                 :src="blogSettingsStore.blogSettings.avatar"/>    
                 <span
                     class="bottom-0 left-10 absolute w-3.5 h-3.5 bg-green-400 border-2 border-white dark:border-gray-800 rounded-full"></span>
