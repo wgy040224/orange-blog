@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class FindCategoryPageListRspVO {
+
     /**
      * 分类 ID
      */
@@ -35,5 +36,9 @@ public class FindCategoryPageListRspVO {
      */
     private LocalDateTime createTime;
 
-}
+    /**
+     * 文章总数
+     */
+    private Integer articlesTotal;
 
+}

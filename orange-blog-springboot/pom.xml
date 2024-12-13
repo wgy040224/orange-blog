@@ -127,7 +127,7 @@
             <dependency>
                 <groupId>p6spy</groupId>
                 <artifactId>p6spy</artifactId>
-                <version>${p6spy.version}</version>
+                <version>3.9.1</version>
             </dependency>
 
             <!--   JWT   -->

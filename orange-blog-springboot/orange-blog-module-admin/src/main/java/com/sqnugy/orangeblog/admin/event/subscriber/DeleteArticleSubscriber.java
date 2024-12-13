@@ -1,6 +1,7 @@
 package com.sqnugy.orangeblog.admin.event.subscriber;
 
 import com.sqnugy.orangeblog.admin.event.DeleteArticleEvent;
+import com.sqnugy.orangeblog.admin.service.AdminStatisticsService;
 import com.sqnugy.orangeblog.search.LuceneHelper;
 import com.sqnugy.orangeblog.search.index.ArticleIndex;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,8 @@ public class DeleteArticleSubscriber {
 
     @Autowired
     private LuceneHelper luceneHelper;
+    @Autowired
+    private AdminStatisticsService statisticsService;
 
     @Async("threadPoolTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -45,5 +48,9 @@ public class DeleteArticleSubscriber {
         long count = luceneHelper.deleteDocument(ArticleIndex.NAME, condition);
 
         log.info("==> 删除文章对应 Lucene 文档结束，articleId: {}，受影响行数: {}", articleId, count);
+
+        // 重新统计各分类下文章总数
+        statisticsService.statisticsCategoryArticleTotal();
+        log.info("==> 重新统计各分类下文章总数");
     }
 }

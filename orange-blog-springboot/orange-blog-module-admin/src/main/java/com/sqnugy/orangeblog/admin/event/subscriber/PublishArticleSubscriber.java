@@ -1,6 +1,7 @@
 package com.sqnugy.orangeblog.admin.event.subscriber;
 
 import com.sqnugy.orangeblog.admin.event.PublishArticleEvent;
+import com.sqnugy.orangeblog.admin.service.AdminStatisticsService;
 import com.sqnugy.orangeblog.common.constant.Constants;
 import com.sqnugy.orangeblog.common.domain.dos.ArticleContentDO;
 import com.sqnugy.orangeblog.common.domain.dos.ArticleDO;
@@ -37,6 +38,8 @@ public class PublishArticleSubscriber {
     private ArticleMapper articleMapper;
     @Autowired
     private ArticleContentMapper articleContentMapper;
+    @Autowired
+    private AdminStatisticsService statisticsService;
 
     @Async("threadPoolTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -68,5 +71,9 @@ public class PublishArticleSubscriber {
         long count = luceneHelper.addDocument(ArticleIndex.NAME, document);
 
         log.info("==> 添加文章对应 Lucene 文档结束，articleId: {}，受影响行数: {}", articleId, count);
+
+        // 重新统计各分类下文章总数
+        statisticsService.statisticsCategoryArticleTotal();
+        log.info("==> 重新统计各分类下文章总数");
     }
 }

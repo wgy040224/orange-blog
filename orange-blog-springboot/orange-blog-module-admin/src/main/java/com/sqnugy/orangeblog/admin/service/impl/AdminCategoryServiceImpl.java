@@ -93,7 +93,7 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
 
         List<CategoryDO> categoryDOS = categoryDOPage.getRecords();
 
-        // DO 转 VO
+        /// DO 转 VO
         List<FindCategoryPageListRspVO> vos = null;
         if (!CollectionUtils.isEmpty(categoryDOS)) {
             vos = categoryDOS.stream()
@@ -101,6 +101,7 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
                             .id(categoryDO.getId())
                             .name(categoryDO.getName())
                             .createTime(categoryDO.getCreateTime())
+                            .articlesTotal(categoryDO.getArticlesTotal())
                             .build())
                     .collect(Collectors.toList());
         }
