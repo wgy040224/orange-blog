@@ -35,11 +35,20 @@
         </div>
 
         <!-- 标签列表 -->
-        <span v-for="(tag, index) in tags" :key="index" @click="goTagArticleListPage(tag.id, tag.name)"
-            class="inline-block mb-1 cursor-pointer bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 
-            rounded hover:bg-green-200 hover:text-green-900 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-950">
-            {{ tag.name }}
-        </span>
+        <div class="text-sm flex flex-wrap gap-3 font-medium text-gray-600 rounded-lg dark:border-gray-600 dark:text-white">
+            <a @click="goTagArticleListPage(tag.id, tag.name)" v-for="(tag, index) in tags"
+                :key="index"
+                class="cursor-pointer inline-flex items-center px-2.5 py-1 text-xs font-medium text-center border rounded-lg bg-green-200 text-green-800
+hover:bg-green-400 focus:ring-4 focus:outline-none focus:ring-green-300 
+dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-950 dark:focus:ring-green-800 dark:border-green-700 dark:hover:text-white">
+                {{ tag.name }}
+                <span
+                    class="inline-flex items-center justify-center w-4 h-4 ms-2 text-xs font-semibold text-sky-800 bg-sky-200 rounded-full">
+                    {{ tag.articlesTotal }}
+                </span>
+            </a>
+        </div>
+
     </div>
 </template>
 
