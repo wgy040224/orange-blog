@@ -26,6 +26,11 @@
             <artifactId>orange-blog-module-admin</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.sqnugy</groupId>
+            <artifactId>orange-blog-module-search</artifactId>
+        </dependency>
+
         <!-- Web 依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
