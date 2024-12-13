@@ -16,6 +16,7 @@ import com.sqnugy.orangeblog.common.utils.Response;
 import com.sqnugy.orangeblog.web.convert.ArticleConvert;
 import com.sqnugy.orangeblog.web.model.vo.tag.FindTagArticlePageListReqVO;
 import com.sqnugy.orangeblog.web.model.vo.tag.FindTagArticlePageListRspVO;
+import com.sqnugy.orangeblog.web.model.vo.tag.FindTagListReqVO;
 import com.sqnugy.orangeblog.web.model.vo.tag.FindTagListRspVO;
 import com.sqnugy.orangeblog.web.service.TagService;
 import lombok.extern.slf4j.Slf4j;
@@ -51,9 +52,16 @@ public class TagServiceImpl implements TagService {
      * @return
      */
     @Override
-    public Response findTagList() {
-        // 查询所有标签
-        List<TagDO> tagDOS = tagMapper.selectList(Wrappers.emptyWrapper());
+    public Response findTagList(FindTagListReqVO findTagListReqVO) {
+        Long size = findTagListReqVO.getSize();
+
+        List<TagDO> tagDOS = null;
+        if (Objects.isNull(size) || size == 0) {
+            // 查询所有标签
+            tagDOS = tagMapper.selectList(Wrappers.emptyWrapper());
+        } else {
+            tagDOS = tagMapper.selectByLimit(size);
+        }
 
         // DO 转 VO
         List<FindTagListRspVO> vos = null;

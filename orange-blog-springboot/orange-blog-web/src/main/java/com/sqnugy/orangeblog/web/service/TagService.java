@@ -2,6 +2,7 @@ package com.sqnugy.orangeblog.web.service;
 
 import com.sqnugy.orangeblog.common.utils.Response;
 import com.sqnugy.orangeblog.web.model.vo.tag.FindTagArticlePageListReqVO;
+import com.sqnugy.orangeblog.web.model.vo.tag.FindTagListReqVO;
 
 /**
  * @author sqnugy
@@ -16,7 +17,7 @@ public interface TagService {
      * 获取标签列表
      * @return
      */
-    Response findTagList();
+    Response findTagList(FindTagListReqVO findTagListReqVO);
 
     /**
      * 获取标签下文章分页列表

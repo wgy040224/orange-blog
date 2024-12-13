@@ -22,19 +22,25 @@ import java.util.Objects;
 public interface TagMapper extends BaseMapper<TagDO> {
 
     /**
-     * 查询分类标签数据
+     * 分页查询
+     * @param current
+     * @param size
+     * @param name
+     * @param startDate
+     * @param endDate
      * @return
      */
     default Page<TagDO> selectPageList(long current, long size, String name, LocalDate startDate, LocalDate endDate) {
-        //分页对象
+        // 分页对象
         Page<TagDO> page = new Page<>(current, size);
-        //构造查询条件
+
+        // 构建查询条件
         LambdaQueryWrapper<TagDO> wrapper = new LambdaQueryWrapper<>();
         wrapper
-                .like(Objects.nonNull(name), TagDO::getName, name)
-                .ge(Objects.nonNull(startDate), TagDO::getCreateTime, startDate)
-                .le(Objects.nonNull(endDate), TagDO::getCreateTime, endDate)
-                .orderByDesc(TagDO::getCreateTime); //order by create_time desc
+                .like(Objects.nonNull(name), TagDO::getName, name) // 模糊查询
+                .ge(Objects.nonNull(startDate), TagDO::getCreateTime, startDate) // 大于等于开始时间
+                .le(Objects.nonNull(endDate), TagDO::getCreateTime, endDate) // 小于等于结束时间
+                .orderByDesc(TagDO::getCreateTime); // order by create_time desc
 
         return selectPage(page, wrapper);
     }
@@ -47,7 +53,7 @@ public interface TagMapper extends BaseMapper<TagDO> {
     default List<TagDO> selectByKey(String key) {
         LambdaQueryWrapper<TagDO> wrapper = new LambdaQueryWrapper<>();
 
-        //构造模糊查询的条件
+        // 构造模糊查询的条件
         wrapper.like(TagDO::getName, key).orderByDesc(TagDO::getCreateTime);
 
         return selectList(wrapper);
@@ -61,6 +67,12 @@ public interface TagMapper extends BaseMapper<TagDO> {
     default List<TagDO> selectByIds(List<Long> tagIds) {
         return selectList(Wrappers.<TagDO>lambdaQuery()
                 .in(TagDO::getId, tagIds));
+    }
+
+    default List<TagDO> selectByLimit(Long limit) {
+        return selectList(Wrappers.<TagDO>lambdaQuery()
+                .orderByDesc(TagDO::getArticlesTotal) // 按文章总数倒序排列
+                .last(String.format("LIMIT %d", limit))); // 查询指定数量
     }
 }
 
