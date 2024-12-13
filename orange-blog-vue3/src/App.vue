@@ -23,7 +23,11 @@ const locale = zhCn
   border-top-color: #F06418;
   border-left-color: #F06418;
 }
-
+/* 暗黑模式 body 背景色 */
+.dark body {
+   --tw-bg-opacity: 1;
+    background-color: rgb(17 24 39 / var(--tw-bg-opacity));
+}
 
 
 </style>

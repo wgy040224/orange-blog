@@ -28,7 +28,6 @@
                     </Transition>
                     
                 </router-view>
-
             </el-main>
             
             <!-- 底栏容器 -->
@@ -45,17 +44,23 @@ import AdminFooter from './components/AdminFooter.vue';
 import AdminHeader from './components/AdminHeader.vue';
 import AdminMenu from './components/AdminMenu.vue';
 import AdminTagList from './components/AdminTagList.vue';
+import { onMounted } from 'vue';
 
 import { useMenuStore } from '@/stores/menu'
 
 const menuStore = useMenuStore()
+
+onMounted(() => {
+    // 移除 html 标签中的 class="dark"
+    document.documentElement.classList.remove('dark');
+})
 </script>
 
 <style scoped>
-
 .el-header {
     padding: 0!important;
 }
+
 .el-footer {
     padding: 0!important;
 }
@@ -92,5 +97,4 @@ const menuStore = useMenuStore()
     transition: all 0.3s;
     transition-delay: 0.3s;
 }
-
 </style>
